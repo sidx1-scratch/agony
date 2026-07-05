@@ -80,6 +80,31 @@ g++ -std=c++17 -O2 -o agony agony.cpp
 - `countdown.agony` — counts down from 5 to 1 using a register, subtraction,
   and a conditional jump loop
 
+## Contributing
+
+Bug reports and PRs to the C++ implementation are welcome, provided they
+preserve the five-way redundancy that is the entire point of this language.
+PRs that quietly make AGONY easier to write will be closed on sight.
+
+### Forks and ports to other languages
+
+Rewrites in other languages are welcome, but the name `agony` is reserved
+for this original C++ implementation. Forks must be named `agony-<language>`
+so nobody confuses a port for the real, maximally painful thing:
+
+- Rust port → `agony-rust`
+- JavaScript port → `agony-js`
+- **Python port → `agony-easy`** (not `agony-py` — let's call it what it is)
+
+If your fork removes the binary/parity/checksum redundancy requirements
+entirely, it must also be renamed to something that does not contain the
+word "agony," since you have, at that point, clearly stopped suffering.
+
+Before submitting a rewrite in another language, contributors are strongly
+encouraged (though not, alas, required) to first achieve working proficiency
+in x86 assembly and C++, as a show of good faith to the spirit of the
+project.
+
 ## Writing your own AGONY programs
 
 1. Decide what you want to do.
