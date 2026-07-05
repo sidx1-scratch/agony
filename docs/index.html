@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGONY — A Lightweight Programming Language</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0800;
+            --text-amber: #d4a574;
+            --accent-amber: #f0c674;
+            --hazard-yellow: #ffd700;
+            --hazard-red: #ff4444;
+            --success-green: #90ee90;
+            --border-amber: #4a3f2a;
+            --scan-line: rgba(255, 215, 0, 0.03);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        body {
+            font-family: "JetBrains Mono", monospace;
+            background: var(--bg);
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    var(--scan-line) 0px,
+                    var(--scan-line) 2px,
+                    transparent 2px,
+                    transparent 4px
+                );
+            color: var(--text-amber);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+            z-index: -1;
+        }
+
+        header {
+            padding: 2rem 2rem;
+            border-bottom: 2px solid var(--border-amber);
+            position: sticky;
+            top: 0;
+            background: rgba(10, 8, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--accent-amber);
+            text-shadow: 0 0 10px rgba(240, 198, 116, 0.3);
+            font-style: italic;
+            font-family: Georgia, serif;
+        }
+
+        nav a {
+            color: var(--text-amber);
+            text-decoration: none;
+            margin-left: 2.5rem;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover {
+            color: var(--accent-amber);
+            text-shadow: 0 0 8px rgba(240, 198, 116, 0.5);
+        }
+
+        .hazard-divider {
+            height: 1.5rem;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--hazard-yellow),
+                var(--hazard-yellow) 10px,
+                #000 10px,
+                #000 20px
+            );
+            margin: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hazard-divider::after {
+            content: '⚠ WARNING ⚠';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            background: var(--hazard-yellow);
+            padding: 0 0.5rem;
+        }
+
+        .hero {
+            max-width: 1000px;
+            margin: 4rem auto 0;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+            color: var(--accent-amber);
+            text-shadow: 0 0 20px rgba(240, 198, 116, 0.4);
+            font-family: Georgia, serif;
+            font-style: italic;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--hazard-yellow);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .subtext {
+            font-size: 0.9rem;
+            color: var(--text-amber);
+            margin-bottom: 3rem;
+            opacity: 0.8;
+        }
+
+        .decoder {
+            background: var(--bg);
+            border: 2px solid var(--hazard-yellow);
+            border-radius: 4px;
+            padding: 2rem;
+            margin: 3rem 0;
+            box-shadow: inset 0 0 20px rgba(240, 198, 116, 0.1), 0 0 20px rgba(240, 198, 116, 0.1);
+        }
+
+        .decoder-step {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .decoder-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            color: var(--hazard-yellow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .step-content {
+            background: rgba(212, 165, 116, 0.05);
+            border-left: 3px solid var(--hazard-yellow);
+            padding: 1rem;
+            font-family: "Courier New", monospace;
+            font-size: 1.1rem;
+            color: var(--accent-amber);
+            word-break: break-all;
+            text-shadow: 0 0 10px rgba(240, 198, 116, 0.2);
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 0.95rem;
+            border: 2px solid var(--accent-amber);
+            background: transparent;
+            color: var(--accent-amber);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        .btn:hover {
+            background: var(--accent-amber);
+            color: var(--bg);
+            text-shadow: none;
+            box-shadow: 0 0 15px rgba(240, 198, 116, 0.5);
+        }
+
+        .pain-meter-section {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .pain-meter-section h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--accent-amber);
+            text-align: center;
+        }
+
+        .pain-comparison {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .pain-card {
+            background: rgba(212, 165, 116, 0.05);
+            border: 2px solid var(--border-amber);
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .pain-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-amber);
+        }
+
+        .pain-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-amber);
+            opacity: 0.7;
+            margin-bottom: 1rem;
+        }
+
+        .pain-meter {
+            width: 100%;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--hazard-yellow);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .pain-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green), var(--hazard-yellow), var(--hazard-red));
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #000;
+            text-shadow: 0 0 4px rgba(255,255,255,0.3);
+        }
+
+        .pain-description {
+            font-size: 0.85rem;
+            color: var(--text-amber);
+            line-height: 1.6;
+        }
+
+        .specs {
+            max-width: 1000px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .specs h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--accent-amber);
+            text-align: center;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .spec-item {
+            background: rgba(212, 165, 116, 0.05);
+            border-left: 3px solid var(--hazard-yellow);
+            padding: 1.5rem;
+            border-radius: 2px;
+        }
+
+        .spec-item h3 {
+            color: var(--accent-amber);
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .spec-item p {
+            font-size: 0.9rem;
+            color: var(--text-amber);
+            line-height: 1.7;
+        }
+
+        .syntax-section {
+            max-width: 1000px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .syntax-section h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--accent-amber);
+            text-align: center;
+        }
+
+        .syntax-breakdown {
+            background: var(--bg);
+            border: 2px solid var(--hazard-yellow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 4px;
+        }
+
+        .syntax-line {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+            color: var(--accent-amber);
+            font-weight: 500;
+        }
+
+        .syntax-line:last-child {
+            margin-bottom: 0;
+        }
+
+        .syntax-legend {
+            font-size: 0.85rem;
+            color: var(--text-amber);
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-amber);
+        }
+
+        .legend-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-label {
+            color: var(--hazard-yellow);
+            font-weight: 700;
+        }
+
+        .quickstart {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: rgba(212, 165, 116, 0.05);
+            border: 2px solid var(--hazard-yellow);
+            border-radius: 4px;
+        }
+
+        .quickstart h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-amber);
+        }
+
+        .quickstart ol {
+            list-style: decimal;
+            list-style-position: inside;
+            color: var(--text-amber);
+        }
+
+        .quickstart li {
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .quickstart code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.25rem 0.5rem;
+            color: var(--accent-amber);
+            font-size: 0.9rem;
+        }
+
+        footer {
+            border-top: 2px solid var(--border-amber);
+            padding: 2rem;
+            margin-top: 6rem;
+            text-align: center;
+            color: var(--text-amber);
+            opacity: 0.8;
+        }
+
+        .footer-links {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--accent-amber);
+            text-decoration: none;
+            margin: 0 1.5rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: text-shadow 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            text-shadow: 0 0 10px rgba(240, 198, 116, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .decoder-step {
+                grid-template-columns: 1fr;
+            }
+
+            .pain-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav a {
+                margin-left: 1rem;
+                margin-right: 1rem;
+                font-size: 0.8rem;
+            }
+
+            .cta-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        .glitch:hover {
+            animation: glitch 0.3s ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(240, 198, 116, 0.4); }
+            50% { text-shadow: 0 0 20px rgba(240, 198, 116, 0.7); }
+        }
+
+        .pulse {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo glitch">AGONY</div>
+            <nav>
+                <a href="#decoder">Decoder</a>
+                <a href="#pain">Pain</a>
+                <a href="#syntax">Syntax</a>
+                <a href="#quickstart">Install</a>
+                <a href="https://github.com/sidx1-scratch/agony" target="_blank">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="pulse">AGONY</h1>
+            <div class="tagline">A lightweight programming language with syntax that puts assembly to shame</div>
+            <div class="subtext">Industrial grade suffering. Zero dependencies. Zero mercy.</div>
+
+            <div class="cta-group">
+                <a href="https://github.com/sidx1-scratch/agony/releases" class="btn">⬇ Download</a>
+                <a href="https://github.com/sidx1-scratch/agony" class="btn">→ Repository</a>
+            </div>
+        </section>
+
+        <div class="hazard-divider"></div>
+
+        <section id="decoder" class="decoder">
+            <h2 style="text-align: center; color: var(--accent-amber); margin-bottom: 2rem;">Instruction Decoder</h2>
+            <p style="text-align: center; color: var(--text-amber); margin-bottom: 2rem; font-size: 0.9rem;">Every single instruction requires five simultaneous encodings. Change any one and the whole thing breaks.</p>
+
+            <div class="decoder-step">
+                <div>
+                    <div class="step-label">Step 1: Binary Opcode</div>
+                    <div class="step-content">00001000</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="step-label">The raw byte</div>
+                    <div style="font-size: 0.9rem; color: var(--text-amber);">8-bit representation. Immutable. No shortcuts.</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <span style="font-size: 1.5rem; color: var(--hazard-yellow);">↓</span>
+            </div>
+
+            <div class="decoder-step">
+                <div>
+                    <div class="step-label">Step 2: Assembly Mnemonic</div>
+                    <div class="step-content">MOV</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="step-label">Must match the binary</div>
+                    <div style="font-size: 0.9rem; color: var(--text-amber);">Opcode 8 = MOV. Any mismatch = compilation failure.</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <span style="font-size: 1.5rem; color: var(--hazard-yellow);">↓</span>
+            </div>
+
+            <div class="decoder-step">
+                <div>
+                    <div class="step-label">Step 3: Operands (Emoji-Tagged)</div>
+                    <div class="step-content">📍R0🔢5</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="step-label">Each prefixed with its type emoji</div>
+                    <div style="font-size: 0.9rem; color: var(--text-amber);">📍=register, 🔢=number, 🔤=string, 🎯=label. No spaces.</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <span style="font-size: 1.5rem; color: var(--hazard-yellow);">↓</span>
+            </div>
+
+            <div class="decoder-step">
+                <div>
+                    <div class="step-label">Step 4: Parity Check</div>
+                    <div class="step-content">❌</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="step-label">Computed by hand. Correct or fail.</div>
+                    <div style="font-size: 0.9rem; color: var(--text-amber);">00001000 has 1 set bit (odd) → ❌. Even parity → ✅</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <span style="font-size: 1.5rem; color: var(--hazard-yellow);">↓</span>
+            </div>
+
+            <div class="decoder-step">
+                <div>
+                    <div class="step-label">Step 5: Checksum (Decimal as Emoji)</div>
+                    <div class="step-content">8️⃣</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="step-label">Opcode value in keycap digits</div>
+                    <div style="font-size: 0.9rem; color: var(--text-amber);">Opcode 8 → 8️⃣. Opcode 14 → 1️⃣4️⃣. Triple redundancy.</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <span style="font-size: 1.5rem; color: var(--hazard-yellow);">↓</span>
+            </div>
+
+            <div class="decoder-step">
+                <div>
+                    <div class="step-label">Final Flourish</div>
+                    <div class="step-content">🏁</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="step-label">Mandatory. Non-negotiable.</div>
+                    <div style="font-size: 0.9rem; color: var(--text-amber);">Every instruction ends with this or it refuses to compile.</div>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-amber); margin-top: 2rem; padding-top: 1rem; text-align: center;">
+                <div style="font-size: 1rem; color: var(--accent-amber); font-weight: 700;">Complete instruction:</div>
+                <div style="font-size: 1.1rem; margin-top: 0.75rem; word-break: break-all; color: var(--accent-amber);">00001000::MOV::📍R0🔢5::❌::8️⃣::🏁</div>
+            </div>
+        </section>
+
+        <div class="hazard-divider"></div>
+
+        <section id="pain" class="pain-meter-section">
+            <h2>The Pain Meter</h2>
+            <p style="text-align: center; color: var(--text-amber); margin-bottom: 2rem; font-size: 0.9rem;">How AGONY stacks up against the usual suspects.</p>
+
+            <div class="pain-comparison">
+                <div class="pain-card">
+                    <h3>C</h3>
+                    <div class="pain-label">Baseline suffering</div>
+                    <div class="pain-meter">
+                        <div class="pain-fill" style="width: 35%;">35%</div>
+                    </div>
+                    <div class="pain-description">Undefined behavior, pointer arithmetic, manual memory. Classic pain.</div>
+                </div>
+
+                <div class="pain-card">
+                    <h3>x86 Assembly</h3>
+                    <div class="pain-label">Expert-only pain</div>
+                    <div class="pain-meter">
+                        <div class="pain-fill" style="width: 70%;">70%</div>
+                    </div>
+                    <div class="pain-description">Register juggling, AT&T syntax dialects, instruction set encyclopedias.</div>
+                </div>
+
+                <div class="pain-card">
+                    <h3>AGONY</h3>
+                    <div class="pain-label">Intentional suffering</div>
+                    <div class="pain-meter">
+                        <div class="pain-fill" style="width: 100%;">∞%</div>
+                    </div>
+                    <div class="pain-description">Every line requires binary, mnemonics, emoji, parity, and checksums to agree. On purpose.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="hazard-divider"></div>
+
+        <section class="specs">
+            <h2>What You Get</h2>
+
+            <div class="spec-grid">
+                <div class="spec-item">
+                    <h3>8 Registers (R0–R7)</h3>
+                    <p>Full working register set. Your own state machine waiting to be tortured.</p>
+                </div>
+                <div class="spec-item">
+                    <h3>Stack Operations</h3>
+                    <p>PUSH, POP. All the classic ways to lose track of what you put where.</p>
+                </div>
+                <div class="spec-item">
+                    <h3>Arithmetic</h3>
+                    <p>ADD, SUB, MUL, DIV. Works exactly as you'd expect, no surprises.</p>
+                </div>
+                <div class="spec-item">
+                    <h3>Control Flow</h3>
+                    <p>JMP, JZ, JNZ. Unconditional and conditional jumps. Loops are technically possible.</p>
+                </div>
+                <div class="spec-item">
+                    <h3>I/O</h3>
+                    <p>PRINT (integers), PRINTS (strings). Get your output. Doubt it.</p>
+                </div>
+                <div class="spec-item">
+                    <h3>Zero Dependencies</h3>
+                    <p>Single C++ file. One compiler. No frameworks, no build systems. Just suffering.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="hazard-divider"></div>
+
+        <section id="syntax" class="syntax-section">
+            <h2>Opcode Reference</h2>
+
+            <div class="syntax-breakdown">
+                <div class="syntax-line">
+                    <span class="legend-label">00000001 :: NOP</span> — do nothing
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00000010 :: PUSH</span> — push value to stack
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00001000 :: MOV</span> — dest = src
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00000100 :: ADD</span> — dest += src
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00000101 :: SUB</span> — dest -= src
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00001001 :: PRINT</span> — print integer
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00001010 :: PRINTS</span> — print string
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00001011 :: JMP</span> — unconditional jump
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00001110 :: JNZ</span> — jump if not zero
+                </div>
+                <div class="syntax-line">
+                    <span class="legend-label">00001111 :: HALT</span> — stop execution
+                </div>
+
+                <div class="syntax-legend">
+                    <div class="legend-item"><span class="legend-label">📍</span> = register (R0–R7)</div>
+                    <div class="legend-item"><span class="legend-label">🔢</span> = number literal (e.g., 5, -42)</div>
+                    <div class="legend-item"><span class="legend-label">🔤</span> = string literal ("quoted text")</div>
+                    <div class="legend-item"><span class="legend-label">🎯</span> = label (bare identifier like loop, start)</div>
+                    <div class="legend-item"><span class="legend-label">✅</span> = even parity | <span class="legend-label">❌</span> = odd parity</div>
+                    <div class="legend-item"><span class="legend-label">Keycap digits</span> = opcode decimal value (8️⃣, 1️⃣4️⃣)</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="hazard-divider"></div>
+
+        <section id="quickstart" class="quickstart">
+            <h2>Quick Start</h2>
+            <ol>
+                <li>Download the latest release from GitHub or clone the repo.</li>
+                <li>Extract: <code>unzip agony.zip && cd agony</code></li>
+                <li>Run the installer: <code>./install.sh</code></li>
+                <li>Try an example: <code>agony hello.agony</code></li>
+                <li>Spend the next 3 hours hand-computing bit parity and emoji checksums.</li>
+            </ol>
+            <p style="margin-top: 1.5rem; font-size: 0.9rem; opacity: 0.8;">
+                <strong>Manual build:</strong> <code>g++ -std=c++17 -O2 -o agony agony.cpp</code> then <code>./agony program.agony</code>
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="https://github.com/sidx1-scratch/agony" target="_blank">GitHub</a>
+            <a href="https://github.com/sidx1-scratch/agony/blob/main/README.md" target="_blank">Docs</a>
+            <a href="https://github.com/sidx1-scratch/agony/blob/main/LICENSE" target="_blank">License</a>
+        </div>
+        <p>A lightweight programming language. Amber terminal aesthetic. Zero dependencies. Zero mercy.</p>
+        <p style="margin-top: 1rem; font-size: 0.85rem;">Assembled in pain. Built to inflict suffering. Open source so others can suffer too.</p>
+    </footer>
+</body>
+</html>
