@@ -121,5 +121,8 @@ fi
 
 echo "Try it now:"
 echo "    agony $SCRIPT_DIR/hello.agony"
+echo "    agony $SCRIPT_DIR/countdown.agony"
+echo "    agony $SCRIPT_DIR/rectangle.agony"
+echo "    agony $SCRIPT_DIR/box.agony"
 echo
 echo "May your parity bits always be correct."
