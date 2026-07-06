@@ -79,6 +79,11 @@ g++ -std=c++17 -O2 -o agony agony.cpp
 - `hello.agony` — prints "Hello, World!"
 - `countdown.agony` — counts down from 5 to 1 using a register, subtraction,
   and a conditional jump loop
+- `rectangle.agony` — prints a solid 5×10 rectangle of asterisks using a
+  single counted loop
+- `box.agony` — prints a *hollow* bordered rectangle, built with nested
+  loops and runtime zero-comparisons to distinguish top/bottom/middle rows
+  (no shortcuts, no pre-baked strings for the interior)
 
 ## Contributing
 
